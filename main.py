@@ -8,6 +8,9 @@ import configparser
 import threading
 import keyboard
 
+import lib_window 
+import lib_resize_img
+
 pyautogui.FAILSAFE = False
 pyautogui.PAUSE = 0.1
 
@@ -31,12 +34,19 @@ cfg = configparser.ConfigParser()
 cfg.read('./settings/config.cfg', encoding = 'utf-8')
 delayms = cfg.getint('allConfig', 'delay')
 log = cfg.getboolean('allConfig', 'log')
+# 获取客户端的分辨率 client_size[0] 为 width，1 为 height
+client_size = lib_window.get_window_size('原神')
+print(client_size[0])
+print(client_size[1])
+# 更改图片大小
+lib_resize_img.img_resize('./assets/choose.png',client_size[0], client_size[1])
+lib_resize_img.img_resize('./assets/play.png',client_size[0], client_size[1])
 
 def main():
     print("原神自动对话脚本启动成功")
     while True:
         try: # 找到选项图片
-            location = pyautogui.locateOnScreen('./assets/choose.png'\
+            location = pyautogui.locateOnScreen('./tmp/choose.png'\
                 , region = (0, 0, resolution.width, resolution.height), confidence = 0.9)
             point = pyautogui.center(location)
             rand_x = point.x + np.random.randint(0,50)
@@ -47,7 +57,7 @@ def main():
                 print('[%s]点击选项<%d, %d>'%(timestamp, rand_x, rand_y))
         except Exception: # 找不到选项图片
             try: # 找到播放图片
-                pyautogui.locateOnScreen('./assets/play.png'\
+                pyautogui.locateOnScreen('./tmp/play.png'\
                     , region = (0, 0, resolution.width, resolution.height), confidence = 0.9)
                 pyautogui.press(' ')
                 if(log):
